@@ -196,3 +196,36 @@ WHERE
         FROM orders 
         WHERE customer_id = c.customer_id
     );
+
+	CREATE VIEW customer_purchase_summary AS
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    SUM(o.order_value) AS total_purchase_value
+FROM 
+    customers c
+JOIN 
+    orders o ON c.customer_id = o.customer_id
+GROUP BY 
+    c.customer_id, c.customer_name;
+
+SELECT 
+    cps.customer_id,
+    cps.customer_name,
+    cps.total_purchase_value,
+    p.product_name,
+    p.category,
+    (SELECT SUM(o.order_value)
+     FROM orders o
+     JOIN products p2 ON o.product_id = p2.product_id
+     WHERE p2.category = 'Electronics' AND o.customer_id = cps.customer_id) AS electronics_spending
+FROM 
+    customer_purchase_summary cps
+JOIN 
+    orders o ON cps.customer_id = o.customer_id
+JOIN 
+    products p ON o.product_id = p.product_id
+WHERE 
+    cps.customer_name LIKE '%John%'  -- Filter customers with 'John' in their name
+ORDER BY 
+    cps.total_purchase_value DESC;
