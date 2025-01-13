@@ -177,3 +177,22 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    c.email,
+    o.order_id,
+    o.order_value,
+    o.order_date
+FROM 
+    customers c
+JOIN 
+    orders o ON c.customer_id = o.customer_id
+WHERE 
+    o.order_date = (
+        SELECT MAX(order_date)
+        FROM orders 
+        WHERE customer_id = c.customer_id
+    );
